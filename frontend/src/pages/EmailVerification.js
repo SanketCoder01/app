@@ -70,15 +70,13 @@ export default function EmailVerification() {
 
         {/* Content */}
         <div className="glass-card rounded-3xl p-8 text-center">
-          {verifying && (
+          {verifying ? (
             <div data-testid="verifying-state">
               <Loader2 className="w-16 h-16 text-primary mx-auto mb-4 animate-spin" />
               <h2 className="text-2xl font-heading font-semibold text-foreground mb-2">Verifying Email</h2>
               <p className="text-muted-foreground">Please wait while we verify your email address...</p>
             </div>
-          )}
-
-          {!verifying && verified && (
+          ) : verified ? (
             <div data-testid="success-state">
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
               <h2 className="text-2xl font-heading font-semibold text-foreground mb-2">Email Verified!</h2>
@@ -92,9 +90,7 @@ export default function EmailVerification() {
                 Go to Login
               </Button>
             </div>
-          )}
-
-          {!verifying && error && (
+          ) : error ? (
             <div data-testid="error-state">
               <XCircle className="w-16 h-16 text-destructive mx-auto mb-4" />
               <h2 className="text-2xl font-heading font-semibold text-foreground mb-2">Verification Failed</h2>
@@ -108,7 +104,7 @@ export default function EmailVerification() {
                 Try Again
               </Button>
             </div>
-          )}
+          ) : null}
         </div>
       </motion.div>
     </div>
