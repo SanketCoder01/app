@@ -141,39 +141,44 @@ async def generate_unique_skill_mirror_id() -> str:
     import time
     return f"SK_{int(time.time()) % 1000000}"
 
-async def get_user_from_session(session_token: Optional[str] = Cookie(None)) -> Optional[User]:
-    """Get user from session token"""
-    if not session_token:
+async def get_user_from_token(authorization: Optional[str] = Header(None)) -> Optional[User]:
+    """Get user from Supabase token"""
+    if not authorization or not authorization.startswith('Bearer '):
         return None
     
-    session_doc = await db.user_sessions.find_one(
-        {"session_token": session_token},
-        {"_id": 0}
-    )
+    token = authorization.replace('Bearer ', '')
     
-    if not session_doc:
+    try:
+        # Verify token with Supabase
+        response = supabase.auth.get_user(token)
+        if not response.user:
+            return None
+        
+        supabase_user = response.user
+        
+        # Get user profile from MongoDB
+        user_doc = await db.users.find_one(
+            {"user_id": supabase_user.id},
+            {"_id": 0}
+        )
+        
+        if not user_doc:
+            # Create user profile if doesn't exist
+            user_doc = {
+                "user_id": supabase_user.id,
+                "email": supabase_user.email,
+                "name": supabase_user.user_metadata.get('name', ''),
+                "contact_number": supabase_user.user_metadata.get('contact_number', ''),
+                "profile_completed": False,
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.users.insert_one(user_doc)
+            user_doc = await db.users.find_one({"user_id": supabase_user.id}, {"_id": 0})
+        
+        return User(**user_doc)
+    except Exception as e:
+        logger.error(f"Token verification error: {str(e)}")
         return None
-    
-    # Check expiry
-    expires_at = session_doc["expires_at"]
-    if isinstance(expires_at, str):
-        expires_at = datetime.fromisoformat(expires_at)
-    if expires_at.tzinfo is None:
-        expires_at = expires_at.replace(tzinfo=timezone.utc)
-    
-    if expires_at < datetime.now(timezone.utc):
-        await db.user_sessions.delete_one({"session_token": session_token})
-        return None
-    
-    user_doc = await db.users.find_one(
-        {"user_id": session_doc["user_id"]},
-        {"_id": 0}
-    )
-    
-    if not user_doc:
-        return None
-    
-    return User(**user_doc)
 
 async def create_gemini_analysis(resume_text: str, job_description: str, linkedin_profile: Optional[str] = None) -> Dict[str, Any]:
     """Create AI analysis using Gemini"""
