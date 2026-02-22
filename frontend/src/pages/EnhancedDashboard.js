@@ -21,7 +21,7 @@ export default function EnhancedDashboard({ user }) {
     {
       title: 'Resume Global Verifier',
       description: 'Upload and verify your resume with AI-powered skill verification',
-      icon: <Shield className="w-8 h-8" />,
+      icon: <Shield className="w-6 h-6" />,
       link: '/verify-resume',
       color: 'from-blue-500 to-cyan-500',
       status: 'Not Started',
@@ -30,7 +30,7 @@ export default function EnhancedDashboard({ user }) {
     {
       title: 'AI Resume Rewriter',
       description: 'Optimize your resume for specific job descriptions',
-      icon: <FileEdit className="w-8 h-8" />,
+      icon: <FileEdit className="w-6 h-6" />,
       link: '/resume-optimizer',
       color: 'from-purple-500 to-pink-500',
       status: 'Available',
@@ -39,7 +39,7 @@ export default function EnhancedDashboard({ user }) {
     {
       title: 'ATS Score Analyzer',
       description: 'Check how well your resume passes ATS systems',
-      icon: <Target className="w-8 h-8" />,
+      icon: <Target className="w-6 h-6" />,
       link: '/ats-score',
       color: 'from-green-500 to-emerald-500',
       status: 'Available',
@@ -48,7 +48,7 @@ export default function EnhancedDashboard({ user }) {
     {
       title: 'Career Roadmap Generator',
       description: 'Get personalized career path with milestones',
-      icon: <Map className="w-8 h-8" />,
+      icon: <Map className="w-6 h-6" />,
       link: '/roadmap',
       color: 'from-orange-500 to-red-500',
       status: 'Coming Soon',
@@ -57,7 +57,7 @@ export default function EnhancedDashboard({ user }) {
     {
       title: 'Skill Verification Test',
       description: 'Take proctored test to verify your skills',
-      icon: <Award className="w-8 h-8" />,
+      icon: <Award className="w-6 h-6" />,
       link: '/skill-test',
       color: 'from-indigo-500 to-purple-500',
       status: 'Not Started',
@@ -66,7 +66,7 @@ export default function EnhancedDashboard({ user }) {
     {
       title: 'Certificates',
       description: 'View and download your verified certificates',
-      icon: <BadgeCheck className="w-8 h-8" />,
+      icon: <BadgeCheck className="w-6 h-6" />,
       link: '/certificates',
       color: 'from-yellow-500 to-amber-500',
       status: 'No Certificates',
@@ -75,7 +75,7 @@ export default function EnhancedDashboard({ user }) {
     {
       title: 'Recruiter Visibility',
       description: 'Manage your profile visibility to recruiters',
-      icon: <Eye className="w-8 h-8" />,
+      icon: <Eye className="w-6 h-6" />,
       link: '/recruiter-visibility',
       color: 'from-teal-500 to-cyan-500',
       status: 'Hidden',
@@ -84,7 +84,7 @@ export default function EnhancedDashboard({ user }) {
     {
       title: 'Analysis History',
       description: 'View your previous resume analyses',
-      icon: <Clock className="w-8 h-8" />,
+      icon: <Clock className="w-6 h-6" />,
       link: '/history',
       color: 'from-gray-500 to-slate-500',
       status: 'Available',
@@ -129,7 +129,7 @@ export default function EnhancedDashboard({ user }) {
                 data-testid={`stat-card-${index}`}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <div className={`${stat.color}`}>{stat.icon}</div>
+                  <div className={`${stat.color} w-5 h-5`}>{stat.icon}</div>
                 </div>
                 <div className="text-3xl font-bold text-foreground mb-1">{stat.value}</div>
                 <div className="text-sm text-muted-foreground">{stat.label}</div>
@@ -158,7 +158,7 @@ export default function EnhancedDashboard({ user }) {
                     }
                   }}
                 >
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4 text-white group-hover:scale-110 transition-transform`}>
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-4 text-white group-hover:scale-110 transition-transform`}>
                     {feature.icon}
                   </div>
                   <h3 className="text-lg font-heading font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
