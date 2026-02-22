@@ -105,6 +105,25 @@ class ResumeOptimizerRequest(BaseModel):
     job_description: str
 
 # Helper Functions
+async def generate_unique_skill_mirror_id() -> str:
+    """Generate unique SK_XXXXXX ID"""
+    import random
+    max_attempts = 10
+    
+    for _ in range(max_attempts):
+        # Generate 6-digit number
+        random_number = random.randint(100000, 999999)
+        skill_mirror_id = f"SK_{random_number}"
+        
+        # Check if ID already exists
+        existing = await db.users.find_one({"skill_mirror_id": skill_mirror_id})
+        if not existing:
+            return skill_mirror_id
+    
+    # Fallback with timestamp if all attempts fail
+    import time
+    return f"SK_{int(time.time()) % 1000000}"
+
 async def get_user_from_session(session_token: Optional[str] = Cookie(None)) -> Optional[User]:
     """Get user from session token"""
     if not session_token:
