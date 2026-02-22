@@ -4,7 +4,7 @@ import '@/App.css';
 import LandingPage from './pages/LandingPage';
 import Register from './pages/Register';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
+import EnhancedDashboard from './pages/EnhancedDashboard';
 import ResultsPage from './pages/ResultsPage';
 import HistoryPage from './pages/HistoryPage';
 import SettingsPage from './pages/SettingsPage';
