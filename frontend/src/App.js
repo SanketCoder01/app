@@ -2,6 +2,9 @@ import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-route
 import { useEffect, useState, useRef } from 'react';
 import '@/App.css';
 import LandingPage from './pages/LandingPage';
+import Register from './pages/Register';
+import Login from './pages/Login';
+import EmailVerification from './pages/EmailVerification';
 import Dashboard from './pages/Dashboard';
 import ResultsPage from './pages/ResultsPage';
 import HistoryPage from './pages/HistoryPage';
