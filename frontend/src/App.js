@@ -112,30 +112,66 @@ function ProtectedRoute({ children }) {
 function ProfileCheckRoute({ children }) {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const lastActivityRef = useRef(Date.now());
 
   useEffect(() => {
-    // CRITICAL: If returning from OAuth callback, skip the /me check.
-    if (window.location.hash?.includes('session_id=')) {
+    checkAuth();
+
+    // Setup inactivity detection
+    const updateActivity = () => {
+      lastActivityRef.current = Date.now();
+      localStorage.setItem('last_activity', Date.now().toString());
+    };
+
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+    events.forEach(event => window.addEventListener(event, updateActivity));
+
+    const inactivityCheck = setInterval(() => {
+      const lastActivity = parseInt(localStorage.getItem('last_activity') || Date.now().toString());
+      const now = Date.now();
+      
+      if (now - lastActivity > INACTIVITY_TIMEOUT) {
+        localStorage.removeItem('supabase_token');
+        localStorage.removeItem('supabase_refresh_token');
+        localStorage.removeItem('last_activity');
+        window.location.href = '/';
+      }
+    }, 60000);
+
+    return () => {
+      events.forEach(event => window.removeEventListener(event, updateActivity));
+      clearInterval(inactivityCheck);
+    };
+  }, []);
+
+  const checkAuth = async () => {
+    const token = localStorage.getItem('supabase_token');
+    if (!token) {
+      window.location.href = '/login';
       return;
     }
 
-    const checkAuth = async () => {
-      try {
-        const response = await fetch(`${API}/auth/me`, {
-          credentials: 'include',
-        });
-        if (!response.ok) throw new Error('Not authenticated');
-        const userData = await response.json();
-        setUser(userData);
-      } catch (error) {
-        window.location.href = '/';
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkAuth();
-  }, []);
+    try {
+      const response = await fetch(`${API}/auth/me`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) throw new Error('Not authenticated');
+      
+      const userData = await response.json();
+      setUser(userData);
+      localStorage.setItem('last_activity', Date.now().toString());
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      localStorage.removeItem('supabase_token');
+      localStorage.removeItem('supabase_refresh_token');
+      window.location.href = '/login';
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
