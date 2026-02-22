@@ -641,10 +641,10 @@ async def complete_profile(
 @api_router.post("/analyze/upload")
 async def upload_resume(
     file: UploadFile = File(...),
-    session_token: Optional[str] = Cookie(None)
+    authorization: Optional[str] = Header(None)
 ):
     """Upload resume and extract text"""
-    user = await get_user_from_session(session_token)
+    user = await get_user_from_token(authorization)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
     
