@@ -49,6 +49,7 @@ export default function Register() {
     setIsSubmitting(true);
 
     try {
+      // Use backend API which uses Supabase
       const response = await fetch(`${API}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -84,12 +85,14 @@ export default function Register() {
         throw new Error(data.detail || 'Registration failed');
       }
 
-      toast.success('Registration successful! Please verify your email.');
+      toast.success('Registration successful! Please check your email to confirm your account.', {
+        duration: 5000,
+      });
       
-      // Navigate to verification page with token (in production, send via email)
+      // Redirect to login after successful registration
       setTimeout(() => {
-        navigate(`/verify-email?token=${data.verification_token}`);
-      }, 1000);
+        navigate('/login');
+      }, 2000);
     } catch (error) {
       console.error('Registration error:', error);
       toast.error(error.message || 'Registration failed. Please try again.');
