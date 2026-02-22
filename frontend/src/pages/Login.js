@@ -46,6 +46,26 @@ export default function Login() {
       const data = await response.json();
 
       if (!response.ok) {
+        // Check specific error cases
+        if (response.status === 401) {
+          if (data.detail?.includes('verify your email')) {
+            toast.error('Please verify your email first. Check your inbox.', {
+              duration: 5000,
+            });
+            return;
+          }
+          if (data.detail?.includes('Invalid email or password')) {
+            // Could be user doesn't exist or wrong password
+            toast.error('Invalid email or password. Please check your credentials or register first.', {
+              duration: 4000,
+              action: {
+                label: 'Register',
+                onClick: () => navigate('/register'),
+              },
+            });
+            return;
+          }
+        }
         throw new Error(data.detail || 'Login failed');
       }
 
