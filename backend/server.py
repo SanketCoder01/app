@@ -518,6 +518,26 @@ async def login(request: LoginRequest):
             raise HTTPException(status_code=401, detail="Please verify your email first")
         raise HTTPException(status_code=401, detail="Login failed")
 
+@api_router.get("/auth/me")
+async def get_current_user(authorization: Optional[str] = Header(None)):
+    """Get current user from token"""
+    user = await get_user_from_token(authorization)
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    return user
+
+@api_router.post("/auth/logout")
+async def logout(authorization: Optional[str] = Header(None)):
+    """Logout user"""
+    if authorization and authorization.startswith('Bearer '):
+        token = authorization.replace('Bearer ', '')
+        try:
+            supabase.auth.sign_out()
+        except:
+            pass
+    
+    return {"message": "Logged out successfully"}
+
 @api_router.post("/auth/session", response_model=SessionResponse)
 async def create_session(session_id: str, response: Response):
     """Exchange session_id for user data and set cookie"""
