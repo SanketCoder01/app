@@ -1,12 +1,41 @@
 import { motion } from 'framer-motion';
-import { Hexagon, Sparkles, TrendingUp, Target, Zap, Award } from 'lucide-react';
+import { Hexagon, Sparkles, TrendingUp, Target, Zap, Award, LogOut, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useState, useEffect } from 'react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 export default function LandingPage() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Check if user is logged in
+    const token = localStorage.getItem('supabase_token');
+    if (token) {
+      // Verify token is still valid
+      fetch(`${API}/auth/me`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+        .then(res => res.ok ? setIsLoggedIn(true) : setIsLoggedIn(false))
+        .catch(() => setIsLoggedIn(false));
+    }
+  }, []);
+
   const handleGetStarted = () => {
     window.location.href = '/register';
+  };
+
+  const handleDashboard = () => {
+    window.location.href = '/dashboard';
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('supabase_token');
+    localStorage.removeItem('supabase_refresh_token');
+    localStorage.removeItem('last_activity');
+    setIsLoggedIn(false);
+    window.location.href = '/';
   };
 
   return (
