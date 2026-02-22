@@ -5,10 +5,8 @@ import { Button } from '@/components/ui/button';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function LandingPage() {
-  const handleLogin = () => {
-    // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
-    const redirectUrl = window.location.origin + '/dashboard';
-    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
+  const handleGetStarted = () => {
+    window.location.href = '/register';
   };
 
   return (
