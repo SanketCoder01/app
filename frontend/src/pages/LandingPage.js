@@ -40,6 +40,29 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Header with Dashboard and Logout buttons */}
+      {isLoggedIn && (
+        <div className="fixed top-0 right-0 z-50 p-6 flex gap-4">
+          <Button
+            onClick={handleDashboard}
+            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500"
+            data-testid="header-dashboard-btn"
+          >
+            <LayoutDashboard className="mr-2 h-4 w-4" />
+            Dashboard
+          </Button>
+          <Button
+            onClick={handleLogout}
+            variant="outline"
+            className="border-white/10 hover:bg-white/5"
+            data-testid="header-logout-btn"
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            Logout
+          </Button>
+        </div>
+      )}
+
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-6">
         {/* Spline Embed */}
