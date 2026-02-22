@@ -72,17 +72,22 @@ export default function ProfileCompletion({ user }) {
         }),
       });
 
-      if (!response.ok) throw new Error('Profile completion failed');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Profile completion failed');
+      }
 
       const updatedUser = await response.json();
-      toast.success(`Profile completed! Your Unique ID: ${updatedUser.skill_mirror_id}`);
+      toast.success(`Profile completed! Your Unique ID: ${updatedUser.skill_mirror_id}`, {
+        duration: 3000,
+      });
 
       setTimeout(() => {
-        navigate('/dashboard');
+        window.location.href = '/dashboard';
       }, 1500);
     } catch (error) {
       console.error('Profile completion error:', error);
-      toast.error('Failed to complete profile. Please try again.');
+      toast.error(error.message || 'Failed to complete profile. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
