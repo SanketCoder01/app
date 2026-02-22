@@ -547,7 +547,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-white/10 py-12 px-6" data-testid="footer">
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-3">
               <Hexagon className="w-8 h-8 text-primary" />
               <span className="font-heading font-bold text-xl">SkillMirror AI</span>
@@ -574,19 +574,6 @@ export default function LandingPage() {
             </div>
             <div className="text-sm text-muted-foreground">© 2025 SkillMirror AI. All rights reserved.</div>
           </div>
-          
-          {/* Login Button in Footer */}
-          {!isLoggedIn && (
-            <div className="text-center pt-6 border-t border-white/10">
-              <Button
-                onClick={() => window.location.href = '/login'}
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500"
-                data-testid="footer-login-btn"
-              >
-                Login to Your Account
-              </Button>
-            </div>
-          )}
         </div>
       </footer>
     </div>
