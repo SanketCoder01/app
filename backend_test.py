@@ -20,8 +20,6 @@ class SkillMirrorAPITester:
         
         # Default headers
         test_headers = {'Content-Type': 'application/json'}
-        if self.session_token:
-            test_headers['Authorization'] = f'Bearer {self.session_token}'
         
         # Override with custom headers if provided
         if headers:
@@ -30,6 +28,11 @@ class SkillMirrorAPITester:
         # Remove Content-Type for file uploads
         if files:
             test_headers.pop('Content-Type', None)
+        
+        # Set up cookies for session
+        cookies = {}
+        if self.session_token:
+            cookies['session_token'] = self.session_token
 
         self.tests_run += 1
         print(f"\n🔍 Testing {name}...")
