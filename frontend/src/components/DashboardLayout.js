@@ -24,13 +24,22 @@ export default function DashboardLayout({ children, user }) {
 
   const handleLogout = async () => {
     try {
-      await fetch(`${API}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      });
+      const token = localStorage.getItem('supabase_token');
+      if (token) {
+        await fetch(`${API}/auth/logout`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+      }
+      localStorage.removeItem('supabase_token');
+      localStorage.removeItem('supabase_refresh_token');
+      localStorage.removeItem('last_activity');
       window.location.href = '/';
     } catch (error) {
       console.error('Logout error:', error);
+      localStorage.removeItem('supabase_token');
+      localStorage.removeItem('supabase_refresh_token');
+      localStorage.removeItem('last_activity');
       window.location.href = '/';
     }
   };
