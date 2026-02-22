@@ -43,7 +43,13 @@ export default function Login() {
         }),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        console.error('JSON parse error:', jsonError);
+        throw new Error('Server response error. Please try again.');
+      }
 
       if (!response.ok) {
         // Check specific error cases
@@ -52,10 +58,10 @@ export default function Login() {
             toast.error('Please verify your email first. Check your inbox.', {
               duration: 5000,
             });
+            setIsSubmitting(false);
             return;
           }
           if (data.detail?.includes('Invalid email or password')) {
-            // Could be user doesn't exist or wrong password
             toast.error('Invalid email or password. Please check your credentials or register first.', {
               duration: 4000,
               action: {
@@ -63,6 +69,7 @@ export default function Login() {
                 onClick: () => navigate('/register'),
               },
             });
+            setIsSubmitting(false);
             return;
           }
         }
@@ -73,12 +80,11 @@ export default function Login() {
       
       // Navigate to dashboard
       setTimeout(() => {
-        navigate('/dashboard');
+        window.location.href = '/dashboard';
       }, 500);
     } catch (error) {
       console.error('Login error:', error);
       toast.error(error.message || 'Login failed. Please check your credentials.');
-    } finally {
       setIsSubmitting(false);
     }
   };
