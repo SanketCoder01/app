@@ -666,10 +666,10 @@ async def upload_resume(
 @api_router.post("/analyze/process")
 async def process_analysis(
     request: AnalysisRequest,
-    session_token: Optional[str] = Cookie(None)
+    authorization: Optional[str] = Header(None)
 ):
     """Process full career analysis"""
-    user = await get_user_from_session(session_token)
+    user = await get_user_from_token(authorization)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
     
