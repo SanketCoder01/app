@@ -603,30 +603,13 @@ async def create_session(session_id: str, response: Response):
         logger.error(f"Session creation error: {str(e)}")
         raise HTTPException(status_code=401, detail="Authentication failed")
 
-@api_router.get("/auth/me", response_model=User)
-async def get_current_user(session_token: Optional[str] = Cookie(None)):
-    """Get current user from session"""
-    user = await get_user_from_session(session_token)
-    if not user:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    return user
-
-@api_router.post("/auth/logout")
-async def logout(response: Response, session_token: Optional[str] = Cookie(None)):
-    """Logout user"""
-    if session_token:
-        await db.user_sessions.delete_one({"session_token": session_token})
-    
-    response.delete_cookie(key="session_token", path="/")
-    return {"message": "Logged out successfully"}
-
 @api_router.post("/profile/complete", response_model=User)
 async def complete_profile(
     request: ProfileCompletionRequest,
-    session_token: Optional[str] = Cookie(None)
+    authorization: Optional[str] = Header(None)
 ):
     """Complete user profile and generate unique SK_ID"""
-    user = await get_user_from_session(session_token)
+    user = await get_user_from_token(authorization)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
     
