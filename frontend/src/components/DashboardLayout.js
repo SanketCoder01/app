@@ -160,6 +160,16 @@ export default function DashboardLayout({ children, user }) {
             </nav>
 
             <div className="border-t border-white/10 pt-6 mt-6">
+              {/* SK_ID Display */}
+              {user?.skill_mirror_id && (
+                <div className="mb-4 glass-card p-3 rounded-xl border border-primary/30">
+                  <div className="text-xs text-muted-foreground mb-1">Your Unique ID</div>
+                  <div className="text-lg font-bold text-primary font-mono">
+                    {user.skill_mirror_id}
+                  </div>
+                </div>
+              )}
+              
               <div className="flex items-center gap-3 mb-4">
                 {user?.picture ? (
                   <img src={user.picture} alt={user.name} className="w-10 h-10 rounded-full" />
