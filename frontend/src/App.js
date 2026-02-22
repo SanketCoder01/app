@@ -4,7 +4,6 @@ import '@/App.css';
 import LandingPage from './pages/LandingPage';
 import Register from './pages/Register';
 import Login from './pages/Login';
-import EmailVerification from './pages/EmailVerification';
 import Dashboard from './pages/Dashboard';
 import ResultsPage from './pages/ResultsPage';
 import HistoryPage from './pages/HistoryPage';
@@ -16,43 +15,11 @@ import { Toaster } from 'sonner';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
+const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 
 function AuthCallback() {
-  const location = useLocation();
-  const hasProcessed = useRef(false);
-
-  useEffect(() => {
-    if (hasProcessed.current) return;
-    hasProcessed.current = true;
-
-    const hash = window.location.hash;
-    const params = new URLSearchParams(hash.substring(1));
-    const sessionId = params.get('session_id');
-
-    if (sessionId) {
-      fetch(`${API}/auth/session?session_id=${sessionId}`, {
-        method: 'POST',
-        credentials: 'include',
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          window.location.href = '/dashboard';
-        })
-        .catch((err) => {
-          console.error('Auth error:', err);
-          window.location.href = '/';
-        });
-    }
-  }, []);
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary mx-auto"></div>
-        <p className="mt-4 text-muted-foreground">Authenticating...</p>
-      </div>
-    </div>
-  );
+  // Removed - not needed with Supabase
+  return null;
 }
 
 function ProtectedRoute({ children }) {
