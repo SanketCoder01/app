@@ -49,8 +49,13 @@ class User(BaseModel):
     user_id: str
     email: str
     name: str
+    contact_number: Optional[str] = None
     picture: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    # Password auth fields
+    password_hash: Optional[str] = None
+    email_verified: bool = False
+    verification_token: Optional[str] = None
     # Profile fields
     skill_mirror_id: Optional[str] = None
     profile_completed: bool = False
@@ -61,6 +66,19 @@ class User(BaseModel):
     country: Optional[str] = None
     linkedin_url: Optional[str] = None
     github_url: Optional[str] = None
+
+class RegisterRequest(BaseModel):
+    name: str
+    contact_number: str
+    email: EmailStr
+    password: str
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
+class VerifyEmailRequest(BaseModel):
+    token: str
 
 class ProfileCompletionRequest(BaseModel):
     full_name: str
