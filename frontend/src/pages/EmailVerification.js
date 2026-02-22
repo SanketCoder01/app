@@ -34,6 +34,7 @@ export default function EmailVerification() {
         body: JSON.stringify({ token }),
       });
 
+      // Read JSON once
       const data = await response.json();
 
       if (!response.ok) {
