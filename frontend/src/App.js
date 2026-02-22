@@ -8,6 +8,7 @@ import HistoryPage from './pages/HistoryPage';
 import SettingsPage from './pages/SettingsPage';
 import ATSScorePage from './pages/ATSScorePage';
 import ResumeOptimizerPage from './pages/ResumeOptimizerPage';
+import ProfileCompletion from './pages/ProfileCompletion';
 import { Toaster } from 'sonner';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
