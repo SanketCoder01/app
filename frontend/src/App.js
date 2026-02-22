@@ -205,7 +205,7 @@ function AppRouter() {
         path="/dashboard"
         element={
           <ProfileCheckRoute>
-            {(user) => <Dashboard user={user} />}
+            {(user) => <EnhancedDashboard user={user} />}
           </ProfileCheckRoute>
         }
       />
