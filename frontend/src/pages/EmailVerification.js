@@ -34,8 +34,13 @@ export default function EmailVerification() {
         body: JSON.stringify({ token }),
       });
 
-      // Read JSON once
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        console.error('JSON parse error:', jsonError);
+        throw new Error('Server response error. Please try again.');
+      }
 
       if (!response.ok) {
         throw new Error(data.detail || 'Verification failed');
