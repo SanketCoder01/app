@@ -34,10 +34,10 @@ export default function Login() {
     setIsSubmitting(true);
 
     try {
+      // Use backend API which uses Supabase
       const response = await fetch(`${API}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
@@ -75,6 +75,12 @@ export default function Login() {
           }
         }
         throw new Error(data.detail || 'Login failed');
+      }
+
+      // Store access token in localStorage
+      localStorage.setItem('supabase_token', data.access_token);
+      if (data.refresh_token) {
+        localStorage.setItem('supabase_refresh_token', data.refresh_token);
       }
 
       toast.success('Login successful!');
