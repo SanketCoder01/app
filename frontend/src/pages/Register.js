@@ -62,6 +62,17 @@ export default function Register() {
       const data = await response.json();
 
       if (!response.ok) {
+        // Check if email already exists
+        if (response.status === 400 && data.detail?.includes('already registered')) {
+          toast.error('Email already registered. Please login instead.', {
+            duration: 4000,
+            action: {
+              label: 'Go to Login',
+              onClick: () => navigate('/login'),
+            },
+          });
+          return;
+        }
         throw new Error(data.detail || 'Registration failed');
       }
 
