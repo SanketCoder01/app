@@ -470,86 +470,53 @@ async def register(request: RegisterRequest):
             raise HTTPException(status_code=400, detail="Email already registered")
         raise HTTPException(status_code=400, detail=f"Registration failed: {error_message}")
 
-@api_router.post("/auth/verify-email")
-async def verify_email(request: VerifyEmailRequest):
-    """Verify user email with token"""
-    user = await db.users.find_one(
-        {"verification_token": request.token},
-        {"_id": 0}
-    )
-    
-    if not user:
-        raise HTTPException(status_code=400, detail="Invalid verification token")
-    
-    if user.get("email_verified"):
-        raise HTTPException(status_code=400, detail="Email already verified")
-    
-    # Update user as verified
-    await db.users.update_one(
-        {"user_id": user["user_id"]},
-        {"$set": {
-            "email_verified": True,
-            "verification_token": None
-        }}
-    )
-    
-    return {"message": "Email verified successfully. You can now login."}
-
 @api_router.post("/auth/login")
-async def login(request: LoginRequest, response: Response):
-    """Login with email and password"""
-    # Find user
-    user_doc = await db.users.find_one({"email": request.email}, {"_id": 0})
-    
-    if not user_doc:
-        raise HTTPException(status_code=401, detail="Invalid email or password")
-    
-    # Check if email verified
-    if not user_doc.get("email_verified", False):
-        raise HTTPException(status_code=401, detail="Please verify your email first")
-    
-    # Verify password
-    if not user_doc.get("password_hash"):
-        raise HTTPException(status_code=401, detail="Invalid email or password")
-    
-    password_valid = bcrypt.checkpw(
-        request.password.encode('utf-8'),
-        user_doc["password_hash"].encode('utf-8')
-    )
-    
-    if not password_valid:
-        raise HTTPException(status_code=401, detail="Invalid email or password")
-    
-    # Create session
-    session_token = secrets.token_urlsafe(32)
-    session_doc = {
-        "user_id": user_doc["user_id"],
-        "session_token": session_token,
-        "expires_at": (datetime.now(timezone.utc) + timedelta(days=7)).isoformat(),
-        "created_at": datetime.now(timezone.utc).isoformat()
-    }
-    await db.user_sessions.insert_one(session_doc)
-    
-    # Set cookie
-    response.set_cookie(
-        key="session_token",
-        value=session_token,
-        httponly=True,
-        secure=True,
-        samesite="none",
-        max_age=7*24*60*60,
-        path="/"
-    )
-    
-    # Remove password_hash from response
-    user_doc.pop("password_hash", None)
-    user_doc.pop("verification_token", None)
-    
-    return {
-        "message": "Login successful",
-        "user": User(**user_doc),
-        "session_token": session_token
-    }
+async def login(request: LoginRequest):
+    """Login with Supabase"""
+    try:
+        # Login with Supabase
+        response = supabase.auth.sign_in_with_password({
+            "email": request.email,
+            "password": request.password
+        })
+        
+        if not response.session:
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        # Get or create user profile in MongoDB
+        user_doc = await db.users.find_one(
+            {"user_id": response.user.id},
+            {"_id": 0}
+        )
+        
+        if not user_doc:
+            # Create user profile
+            user_doc = {
+                "user_id": response.user.id,
+                "email": response.user.email,
+                "name": response.user.user_metadata.get('name', ''),
+                "contact_number": response.user.user_metadata.get('contact_number', ''),
+                "profile_completed": False,
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.users.insert_one(user_doc)
+            user_doc = await db.users.find_one({"user_id": response.user.id}, {"_id": 0})
+        
+        return {
+            "message": "Login successful",
+            "access_token": response.session.access_token,
+            "refresh_token": response.session.refresh_token,
+            "user": User(**user_doc)
+        }
+        
+    except Exception as e:
+        logger.error(f"Login error: {str(e)}")
+        error_message = str(e)
+        if "Invalid login credentials" in error_message:
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        if "Email not confirmed" in error_message:
+            raise HTTPException(status_code=401, detail="Please verify your email first")
+        raise HTTPException(status_code=401, detail="Login failed")
 
 @api_router.post("/auth/session", response_model=SessionResponse)
 async def create_session(session_id: str, response: Response):
