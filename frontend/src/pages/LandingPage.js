@@ -193,7 +193,7 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-6">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-6 pt-20">
         {/* Spline Embed */}
         <div className="absolute inset-0 z-0">
           <iframe
@@ -286,8 +286,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* AI Intelligence Section */}
-      <section className="py-24 md:py-32 px-6" data-testid="ai-intelligence-section">
+      {/* AI Intelligence Section - How it Works */}
+      <section id="how-it-works" className="py-24 md:py-32 px-6" data-testid="ai-intelligence-section">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0 }}
@@ -337,7 +337,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 md:py-32 px-6 bg-muted/20" data-testid="features-section">
+      <section id="features" className="py-24 md:py-32 px-6 bg-muted/20" data-testid="features-section">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0 }}
