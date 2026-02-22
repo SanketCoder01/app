@@ -783,10 +783,10 @@ async def delete_analysis(
 @api_router.post("/export/pdf/{analysis_id}")
 async def export_pdf(
     analysis_id: str,
-    session_token: Optional[str] = Cookie(None)
+    authorization: Optional[str] = Header(None)
 ):
     """Export analysis as PDF"""
-    user = await get_user_from_session(session_token)
+    user = await get_user_from_token(authorization)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
     
