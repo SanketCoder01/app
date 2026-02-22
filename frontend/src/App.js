@@ -99,6 +99,54 @@ function ProtectedRoute({ children }) {
   return <>{typeof children === 'function' ? children(user) : children}</>;
 }
 
+function ProfileCheckRoute({ children }) {
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // CRITICAL: If returning from OAuth callback, skip the /me check.
+    if (window.location.hash?.includes('session_id=')) {
+      return;
+    }
+
+    const checkAuth = async () => {
+      try {
+        const response = await fetch(`${API}/auth/me`, {
+          credentials: 'include',
+        });
+        if (!response.ok) throw new Error('Not authenticated');
+        const userData = await response.json();
+        setUser(userData);
+      } catch (error) {
+        window.location.href = '/';
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if profile is completed
+  if (user && !user.profile_completed) {
+    return <ProfileCompletion user={user} />;
+  }
+
+  // Profile completed, show dashboard
+  return <>{typeof children === 'function' ? children(user) : children}</>;
+}
+
 function AppRouter() {
   const location = useLocation();
 
