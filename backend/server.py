@@ -747,9 +747,9 @@ async def optimize_resume(
     return result
 
 @api_router.get("/history")
-async def get_history(session_token: Optional[str] = Cookie(None)):
+async def get_history(authorization: Optional[str] = Header(None)):
     """Get user's analysis history"""
-    user = await get_user_from_session(session_token)
+    user = await get_user_from_token(authorization)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
     
