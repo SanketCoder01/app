@@ -49,6 +49,26 @@ class User(BaseModel):
     name: str
     picture: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    # Profile fields
+    skill_mirror_id: Optional[str] = None
+    profile_completed: bool = False
+    university: Optional[str] = None
+    course: Optional[str] = None
+    prn_number: Optional[str] = None
+    graduation_year: Optional[int] = None
+    country: Optional[str] = None
+    linkedin_url: Optional[str] = None
+    github_url: Optional[str] = None
+
+class ProfileCompletionRequest(BaseModel):
+    full_name: str
+    university: str
+    course: str
+    prn_number: str
+    graduation_year: int
+    country: str
+    linkedin_url: Optional[str] = None
+    github_url: Optional[str] = None
 
 class UserSession(BaseModel):
     model_config = ConfigDict(extra="ignore")
