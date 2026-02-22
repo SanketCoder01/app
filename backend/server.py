@@ -530,10 +530,9 @@ async def get_current_user(authorization: Optional[str] = Header(None)):
 async def logout(authorization: Optional[str] = Header(None)):
     """Logout user"""
     if authorization and authorization.startswith('Bearer '):
-        token = authorization.replace('Bearer ', '')
         try:
             supabase.auth.sign_out()
-        except:
+        except Exception:
             pass
     
     return {"message": "Logged out successfully"}
