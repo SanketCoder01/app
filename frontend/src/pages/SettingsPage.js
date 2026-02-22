@@ -66,6 +66,16 @@ export default function SettingsPage({ user }) {
               </div>
 
               <div className="space-y-4">
+                {/* Unique SK_ID */}
+                {user?.skill_mirror_id && (
+                  <div className="glass-card p-4 rounded-xl border border-primary/30 bg-primary/5">
+                    <label className="text-sm font-medium text-muted-foreground mb-2 block">Your Unique ID</label>
+                    <div className="text-2xl font-bold text-primary font-mono" data-testid="settings-skill-mirror-id">
+                      {user.skill_mirror_id}
+                    </div>
+                  </div>
+                )}
+                
                 <div>
                   <label className="text-sm font-medium text-foreground mb-2 block">Name</label>
                   <Input
@@ -84,6 +94,36 @@ export default function SettingsPage({ user }) {
                     data-testid="profile-email-input"
                   />
                 </div>
+                {user?.university && (
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-2 block">University</label>
+                    <Input
+                      value={user.university}
+                      readOnly
+                      className="bg-white/5 border-white/10 text-white"
+                    />
+                  </div>
+                )}
+                {user?.course && (
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-2 block">Course</label>
+                    <Input
+                      value={user.course}
+                      readOnly
+                      className="bg-white/5 border-white/10 text-white"
+                    />
+                  </div>
+                )}
+                {user?.country && (
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-2 block">Country</label>
+                    <Input
+                      value={user.country}
+                      readOnly
+                      className="bg-white/5 border-white/10 text-white"
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
