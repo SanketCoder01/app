@@ -50,16 +50,12 @@ logger = logging.getLogger(__name__)
 # Models
 class User(BaseModel):
     model_config = ConfigDict(extra="ignore")
-    user_id: str
+    user_id: str  # Supabase user ID
     email: str
     name: str
     contact_number: Optional[str] = None
     picture: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    # Password auth fields
-    password_hash: Optional[str] = None
-    email_verified: bool = False
-    verification_token: Optional[str] = None
     # Profile fields
     skill_mirror_id: Optional[str] = None
     profile_completed: bool = False
@@ -80,9 +76,6 @@ class RegisterRequest(BaseModel):
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
-
-class VerifyEmailRequest(BaseModel):
-    token: str
 
 class ProfileCompletionRequest(BaseModel):
     full_name: str
