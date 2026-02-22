@@ -279,7 +279,7 @@ export default function LandingPage() {
               Join thousands of professionals who have already accelerated their career growth with SkillMirror AI.
             </p>
             <Button
-              onClick={handleLogin}
+              onClick={handleGetStarted}
               size="lg"
               className="h-14 px-10 rounded-full font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(99,102,241,0.6)] text-lg"
               data-testid="cta-get-started-btn"
