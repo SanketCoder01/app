@@ -56,10 +56,19 @@ export default function ProfileCompletion({ user }) {
     setIsSubmitting(true);
 
     try {
+      const token = localStorage.getItem('supabase_token');
+      if (!token) {
+        toast.error('Not authenticated');
+        window.location.href = '/login';
+        return;
+      }
+
       const response = await fetch(`${API}/profile/complete`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           full_name: formData.full_name,
           university: formData.university,
