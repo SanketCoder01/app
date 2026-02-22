@@ -345,32 +345,47 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-white/10 py-12 px-6" data-testid="footer">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-3">
-            <Hexagon className="w-8 h-8 text-primary" />
-            <span className="font-heading font-bold text-xl">SkillMirror AI</span>
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-6">
+            <div className="flex items-center gap-3">
+              <Hexagon className="w-8 h-8 text-primary" />
+              <span className="font-heading font-bold text-xl">SkillMirror AI</span>
+            </div>
+            <div className="flex gap-6">
+              <a
+                href="https://www.linkedin.com/in/sanket-gaikwad-50134a314/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                data-testid="footer-linkedin-link"
+              >
+                LinkedIn
+              </a>
+              <a
+                href="https://instagram.com/mr.sanketgofficial"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                data-testid="footer-instagram-link"
+              >
+                Instagram
+              </a>
+            </div>
+            <div className="text-sm text-muted-foreground">© 2025 SkillMirror AI. All rights reserved.</div>
           </div>
-          <div className="flex gap-6">
-            <a
-              href="https://www.linkedin.com/in/sanket-gaikwad-50134a314/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-              data-testid="footer-linkedin-link"
-            >
-              LinkedIn
-            </a>
-            <a
-              href="https://instagram.com/mr.sanketgofficial"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-              data-testid="footer-instagram-link"
-            >
-              Instagram
-            </a>
-          </div>
-          <div className="text-sm text-muted-foreground">© 2025 SkillMirror AI. All rights reserved.</div>
+          
+          {/* Login Button in Footer */}
+          {!isLoggedIn && (
+            <div className="text-center pt-6 border-t border-white/10">
+              <Button
+                onClick={() => window.location.href = '/login'}
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500"
+                data-testid="footer-login-btn"
+              >
+                Login to Your Account
+              </Button>
+            </div>
+          )}
         </div>
       </footer>
     </div>
