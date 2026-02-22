@@ -72,13 +72,19 @@ export default function ProfileCompletion({ user }) {
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Profile completion failed');
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        console.error('JSON parse error:', jsonError);
+        throw new Error('Server response error. Please try again.');
       }
 
-      const updatedUser = await response.json();
-      toast.success(`Profile completed! Your Unique ID: ${updatedUser.skill_mirror_id}`, {
+      if (!response.ok) {
+        throw new Error(data.detail || 'Profile completion failed');
+      }
+
+      toast.success(`Profile completed! Your Unique ID: ${data.skill_mirror_id}`, {
         duration: 3000,
       });
 
@@ -88,7 +94,6 @@ export default function ProfileCompletion({ user }) {
     } catch (error) {
       console.error('Profile completion error:', error);
       toast.error(error.message || 'Failed to complete profile. Please try again.');
-    } finally {
       setIsSubmitting(false);
     }
   };
