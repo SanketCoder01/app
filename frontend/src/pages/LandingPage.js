@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Hexagon, Sparkles, TrendingUp, Target, Zap, Award, LogOut, LayoutDashboard } from 'lucide-react';
+import { Hexagon, Sparkles, TrendingUp, Target, Zap, Award, LogOut, LayoutDashboard, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 
@@ -8,6 +8,7 @@ const API = `${BACKEND_URL}/api`;
 
 export default function LandingPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     // Check if user is logged in
@@ -38,30 +39,158 @@ export default function LandingPage() {
     window.location.href = '/';
   };
 
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+    setMobileMenuOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Header with Dashboard and Logout buttons */}
-      {isLoggedIn && (
-        <div className="fixed top-0 right-0 z-50 p-6 flex gap-4">
-          <Button
-            onClick={handleDashboard}
-            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500"
-            data-testid="header-dashboard-btn"
-          >
-            <LayoutDashboard className="mr-2 h-4 w-4" />
-            Dashboard
-          </Button>
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            className="border-white/10 hover:bg-white/5"
-            data-testid="header-logout-btn"
-          >
-            <LogOut className="mr-2 h-4 w-4" />
-            Logout
-          </Button>
+      {/* Fixed Navigation Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-white/10" data-testid="main-header">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <a href="/" className="flex items-center gap-2" data-testid="header-logo">
+              <Hexagon className="w-8 h-8 text-primary" />
+              <span className="font-heading font-bold text-xl text-foreground">SkillMirror AI</span>
+            </a>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-8">
+              <button 
+                onClick={() => scrollToSection('features')} 
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                data-testid="nav-features"
+              >
+                Features
+              </button>
+              <button 
+                onClick={() => scrollToSection('how-it-works')} 
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                data-testid="nav-how-it-works"
+              >
+                How It Works
+              </button>
+              <button 
+                onClick={() => scrollToSection('about')} 
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                data-testid="nav-about"
+              >
+                About
+              </button>
+            </nav>
+
+            {/* Auth Buttons */}
+            <div className="hidden md:flex items-center gap-4">
+              {isLoggedIn ? (
+                <>
+                  <Button
+                    onClick={handleDashboard}
+                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500"
+                    data-testid="header-dashboard-btn"
+                  >
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Button>
+                  <Button
+                    onClick={handleLogout}
+                    variant="outline"
+                    className="border-white/10 hover:bg-white/5"
+                    data-testid="header-logout-btn"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    onClick={() => window.location.href = '/login'}
+                    variant="ghost"
+                    className="text-muted-foreground hover:text-foreground"
+                    data-testid="header-login-btn"
+                  >
+                    Login
+                  </Button>
+                  <Button
+                    onClick={handleGetStarted}
+                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500"
+                    data-testid="header-signup-btn"
+                  >
+                    Get Started
+                  </Button>
+                </>
+              )}
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button 
+              className="md:hidden text-foreground"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              data-testid="mobile-menu-toggle"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
+
+          {/* Mobile Menu */}
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="md:hidden pt-4 pb-2 border-t border-white/10 mt-4"
+            >
+              <nav className="flex flex-col gap-4">
+                <button 
+                  onClick={() => scrollToSection('features')} 
+                  className="text-left text-muted-foreground hover:text-foreground transition-colors py-2"
+                >
+                  Features
+                </button>
+                <button 
+                  onClick={() => scrollToSection('how-it-works')} 
+                  className="text-left text-muted-foreground hover:text-foreground transition-colors py-2"
+                >
+                  How It Works
+                </button>
+                <button 
+                  onClick={() => scrollToSection('about')} 
+                  className="text-left text-muted-foreground hover:text-foreground transition-colors py-2"
+                >
+                  About
+                </button>
+                <div className="flex flex-col gap-2 pt-4 border-t border-white/10">
+                  {isLoggedIn ? (
+                    <>
+                      <Button onClick={handleDashboard} className="bg-gradient-to-r from-indigo-600 to-purple-600">
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        Dashboard
+                      </Button>
+                      <Button onClick={handleLogout} variant="outline" className="border-white/10">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Logout
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button onClick={() => window.location.href = '/login'} variant="outline" className="border-white/10">
+                        Login
+                      </Button>
+                      <Button onClick={handleGetStarted} className="bg-gradient-to-r from-indigo-600 to-purple-600">
+                        Get Started
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </nav>
+            </motion.div>
+          )}
         </div>
-      )}
+      </header>
 
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-6">
