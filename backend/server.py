@@ -437,6 +437,127 @@ def generate_pdf_report(analysis_data: Dict[str, Any], user_name: str) -> io.Byt
     return buffer
 
 # Auth Routes
+@api_router.post("/auth/register")
+async def register(request: RegisterRequest):
+    """Register new user with email/password"""
+    # Check if email already exists
+    existing_user = await db.users.find_one({"email": request.email}, {"_id": 0})
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Hash password
+    password_hash = bcrypt.hashpw(request.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    
+    # Generate verification token
+    verification_token = secrets.token_urlsafe(32)
+    
+    # Create user
+    user_id = f"user_{uuid.uuid4().hex[:12]}"
+    user_doc = {
+        "user_id": user_id,
+        "email": request.email,
+        "name": request.name,
+        "contact_number": request.contact_number,
+        "password_hash": password_hash,
+        "email_verified": False,
+        "verification_token": verification_token,
+        "profile_completed": False,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.users.insert_one(user_doc)
+    
+    # In production, send email with verification link
+    # For now, return token in response for testing
+    logger.info(f"Verification token for {request.email}: {verification_token}")
+    
+    return {
+        "message": "Registration successful. Please verify your email.",
+        "user_id": user_id,
+        "verification_token": verification_token  # Remove in production
+    }
+
+@api_router.post("/auth/verify-email")
+async def verify_email(request: VerifyEmailRequest):
+    """Verify user email with token"""
+    user = await db.users.find_one(
+        {"verification_token": request.token},
+        {"_id": 0}
+    )
+    
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid verification token")
+    
+    if user.get("email_verified"):
+        raise HTTPException(status_code=400, detail="Email already verified")
+    
+    # Update user as verified
+    await db.users.update_one(
+        {"user_id": user["user_id"]},
+        {"$set": {
+            "email_verified": True,
+            "verification_token": None
+        }}
+    )
+    
+    return {"message": "Email verified successfully. You can now login."}
+
+@api_router.post("/auth/login")
+async def login(request: LoginRequest, response: Response):
+    """Login with email and password"""
+    # Find user
+    user_doc = await db.users.find_one({"email": request.email}, {"_id": 0})
+    
+    if not user_doc:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    # Check if email verified
+    if not user_doc.get("email_verified", False):
+        raise HTTPException(status_code=401, detail="Please verify your email first")
+    
+    # Verify password
+    if not user_doc.get("password_hash"):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    password_valid = bcrypt.checkpw(
+        request.password.encode('utf-8'),
+        user_doc["password_hash"].encode('utf-8')
+    )
+    
+    if not password_valid:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    # Create session
+    session_token = secrets.token_urlsafe(32)
+    session_doc = {
+        "user_id": user_doc["user_id"],
+        "session_token": session_token,
+        "expires_at": (datetime.now(timezone.utc) + timedelta(days=7)).isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.user_sessions.insert_one(session_doc)
+    
+    # Set cookie
+    response.set_cookie(
+        key="session_token",
+        value=session_token,
+        httponly=True,
+        secure=True,
+        samesite="none",
+        max_age=7*24*60*60,
+        path="/"
+    )
+    
+    # Remove password_hash from response
+    user_doc.pop("password_hash", None)
+    user_doc.pop("verification_token", None)
+    
+    return {
+        "message": "Login successful",
+        "user": User(**user_doc),
+        "session_token": session_token
+    }
+
 @api_router.post("/auth/session", response_model=SessionResponse)
 async def create_session(session_id: str, response: Response):
     """Exchange session_id for user data and set cookie"""
