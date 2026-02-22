@@ -35,9 +35,12 @@ export default function ResumeOptimizerPage({ user }) {
       const formData = new FormData();
       formData.append('file', file);
 
+      const token = localStorage.getItem('supabase_token');
       const response = await fetch(`${API}/analyze/upload`, {
         method: 'POST',
-        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
         body: formData,
       });
 
@@ -78,10 +81,13 @@ export default function ResumeOptimizerPage({ user }) {
     }, 800);
 
     try {
+      const token = localStorage.getItem('supabase_token');
       const response = await fetch(`${API}/analyze/optimize`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           resume_text: resumeText,
           job_description: jobDescription,
