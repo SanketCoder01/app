@@ -59,7 +59,13 @@ export default function Register() {
         }),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        console.error('JSON parse error:', jsonError);
+        throw new Error('Server response error. Please try again.');
+      }
 
       if (!response.ok) {
         // Check if email already exists
@@ -71,6 +77,7 @@ export default function Register() {
               onClick: () => navigate('/login'),
             },
           });
+          setIsSubmitting(false);
           return;
         }
         throw new Error(data.detail || 'Registration failed');
@@ -85,7 +92,6 @@ export default function Register() {
     } catch (error) {
       console.error('Registration error:', error);
       toast.error(error.message || 'Registration failed. Please try again.');
-    } finally {
       setIsSubmitting(false);
     }
   };
