@@ -763,10 +763,10 @@ async def get_history(authorization: Optional[str] = Header(None)):
 @api_router.delete("/history/{analysis_id}")
 async def delete_analysis(
     analysis_id: str,
-    session_token: Optional[str] = Cookie(None)
+    authorization: Optional[str] = Header(None)
 ):
     """Delete an analysis"""
-    user = await get_user_from_session(session_token)
+    user = await get_user_from_token(authorization)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
     
