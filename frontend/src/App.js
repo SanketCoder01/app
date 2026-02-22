@@ -26,30 +26,70 @@ function ProtectedRoute({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [user, setUser] = useState(null);
   const location = useLocation();
+  const lastActivityRef = useRef(Date.now());
 
   useEffect(() => {
-    // CRITICAL: If returning from OAuth callback, skip the /me check.
-    // AuthCallback will exchange the session_id and establish the session first.
-    if (window.location.hash?.includes('session_id=')) {
+    checkAuth();
+    
+    // Setup inactivity detection
+    const updateActivity = () => {
+      lastActivityRef.current = Date.now();
+      localStorage.setItem('last_activity', Date.now().toString());
+    };
+
+    // Track user activity
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+    events.forEach(event => window.addEventListener(event, updateActivity));
+
+    // Check for inactivity every minute
+    const inactivityCheck = setInterval(() => {
+      const lastActivity = parseInt(localStorage.getItem('last_activity') || Date.now().toString());
+      const now = Date.now();
+      
+      if (now - lastActivity > INACTIVITY_TIMEOUT) {
+        // Auto logout
+        localStorage.removeItem('supabase_token');
+        localStorage.removeItem('supabase_refresh_token');
+        localStorage.removeItem('last_activity');
+        window.location.href = '/';
+      }
+    }, 60000); // Check every minute
+
+    return () => {
+      events.forEach(event => window.removeEventListener(event, updateActivity));
+      clearInterval(inactivityCheck);
+    };
+  }, [location.pathname]);
+
+  const checkAuth = async () => {
+    const token = localStorage.getItem('supabase_token');
+    if (!token) {
+      setIsAuthenticated(false);
       return;
     }
 
-    const checkAuth = async () => {
-      try {
-        const response = await fetch(`${API}/auth/me`, {
-          credentials: 'include',
-        });
-        if (!response.ok) throw new Error('Not authenticated');
-        const userData = await response.json();
-        setUser(userData);
-        setIsAuthenticated(true);
-      } catch (error) {
-        setIsAuthenticated(false);
-      }
-    };
-
-    checkAuth();
-  }, [location.pathname]);
+    try {
+      const response = await fetch(`${API}/auth/me`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) throw new Error('Not authenticated');
+      
+      const userData = await response.json();
+      setUser(userData);
+      setIsAuthenticated(true);
+      
+      // Update last activity
+      localStorage.setItem('last_activity', Date.now().toString());
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      localStorage.removeItem('supabase_token');
+      localStorage.removeItem('supabase_refresh_token');
+      setIsAuthenticated(false);
+    }
+  };
 
   if (isAuthenticated === null) {
     return (
@@ -63,7 +103,7 @@ function ProtectedRoute({ children }) {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return <>{typeof children === 'function' ? children(user) : children}</>;
