@@ -66,7 +66,7 @@ export default function EnhancedDashboard({ user }) {
     {
       title: 'Certificates',
       description: 'View and download your verified certificates',
-      icon: <Certificate className="w-8 h-8" />,
+      icon: <BadgeCheck className="w-8 h-8" />,
       link: '/certificates',
       color: 'from-yellow-500 to-amber-500',
       status: 'No Certificates',
