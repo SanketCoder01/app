@@ -58,21 +58,13 @@ export default function LandingPage() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
               <Button
-                onClick={handleLogin}
+                onClick={handleGetStarted}
                 size="lg"
                 className="h-12 px-8 rounded-full font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(99,102,241,0.5)]"
                 data-testid="start-free-analysis-btn"
               >
                 <Sparkles className="mr-2 h-5 w-5" />
-                Start Free Analysis
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="h-12 px-8 rounded-full font-medium border border-white/10 hover:bg-white/5 transition-all"
-                data-testid="watch-demo-btn"
-              >
-                Watch Demo
+                Get Started Free
               </Button>
             </div>
           </motion.div>
