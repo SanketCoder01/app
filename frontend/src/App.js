@@ -161,9 +161,9 @@ function AppRouter() {
       <Route
         path="/dashboard"
         element={
-          <ProtectedRoute>
+          <ProfileCheckRoute>
             {(user) => <Dashboard user={user} />}
-          </ProtectedRoute>
+          </ProfileCheckRoute>
         }
       />
       <Route
