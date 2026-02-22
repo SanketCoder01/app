@@ -6,7 +6,7 @@ import {
   Target, 
   Map, 
   Award, 
-  Certificate,
+  BadgeCheck,
   Eye,
   TrendingUp,
   Users,
