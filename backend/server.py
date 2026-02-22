@@ -499,6 +499,40 @@ async def logout(response: Response, session_token: Optional[str] = Cookie(None)
     response.delete_cookie(key="session_token", path="/")
     return {"message": "Logged out successfully"}
 
+@api_router.post("/profile/complete", response_model=User)
+async def complete_profile(
+    request: ProfileCompletionRequest,
+    session_token: Optional[str] = Cookie(None)
+):
+    """Complete user profile and generate unique SK_ID"""
+    user = await get_user_from_session(session_token)
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    # Generate unique SK_ID
+    skill_mirror_id = await generate_unique_skill_mirror_id()
+    
+    # Update user profile
+    await db.users.update_one(
+        {"user_id": user.user_id},
+        {"$set": {
+            "name": request.full_name,
+            "skill_mirror_id": skill_mirror_id,
+            "profile_completed": True,
+            "university": request.university,
+            "course": request.course,
+            "prn_number": request.prn_number,
+            "graduation_year": request.graduation_year,
+            "country": request.country,
+            "linkedin_url": request.linkedin_url,
+            "github_url": request.github_url
+        }}
+    )
+    
+    # Fetch updated user
+    updated_user = await db.users.find_one({"user_id": user.user_id}, {"_id": 0})
+    return User(**updated_user)
+
 # Analysis Routes
 @api_router.post("/analyze/upload")
 async def upload_resume(
