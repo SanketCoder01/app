@@ -441,43 +441,34 @@ def generate_pdf_report(analysis_data: Dict[str, Any], user_name: str) -> io.Byt
 # Auth Routes
 @api_router.post("/auth/register")
 async def register(request: RegisterRequest):
-    """Register new user with email/password"""
-    # Check if email already exists
-    existing_user = await db.users.find_one({"email": request.email}, {"_id": 0})
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    
-    # Hash password
-    password_hash = bcrypt.hashpw(request.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-    
-    # Generate verification token
-    verification_token = secrets.token_urlsafe(32)
-    
-    # Create user
-    user_id = f"user_{uuid.uuid4().hex[:12]}"
-    user_doc = {
-        "user_id": user_id,
-        "email": request.email,
-        "name": request.name,
-        "contact_number": request.contact_number,
-        "password_hash": password_hash,
-        "email_verified": False,
-        "verification_token": verification_token,
-        "profile_completed": False,
-        "created_at": datetime.now(timezone.utc).isoformat()
-    }
-    
-    await db.users.insert_one(user_doc)
-    
-    # In production, send email with verification link
-    # For now, return token in response for testing
-    logger.info(f"Verification token for {request.email}: {verification_token}")
-    
-    return {
-        "message": "Registration successful. Please verify your email.",
-        "user_id": user_id,
-        "verification_token": verification_token  # Remove in production
-    }
+    """Register new user with Supabase"""
+    try:
+        # Register with Supabase
+        response = supabase.auth.sign_up({
+            "email": request.email,
+            "password": request.password,
+            "options": {
+                "data": {
+                    "name": request.name,
+                    "contact_number": request.contact_number
+                }
+            }
+        })
+        
+        if not response.user:
+            raise HTTPException(status_code=400, detail="Registration failed")
+        
+        return {
+            "message": "Registration successful. Please check your email to confirm your account.",
+            "user_id": response.user.id
+        }
+        
+    except Exception as e:
+        logger.error(f"Registration error: {str(e)}")
+        error_message = str(e)
+        if "already registered" in error_message.lower() or "already exists" in error_message.lower():
+            raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=400, detail=f"Registration failed: {error_message}")
 
 @api_router.post("/auth/verify-email")
 async def verify_email(request: VerifyEmailRequest):
